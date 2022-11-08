@@ -26,11 +26,13 @@ void CFeatureManager::DoDataExchange(CDataExchange* pDX)
 	CFormView::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_CHK_ACTIVATION, m_chActivation);
 	DDX_Control(pDX, IDC_EDIT_DISK, m_editDistk);
+	DDX_Control(pDX, IDC_PROGRESSBAR, m_Progress);
 }
 
 
 BEGIN_MESSAGE_MAP(CFeatureManager, CFormView)
 	ON_BN_CLICKED(IDC_BTN_DELETE, &CFeatureManager::OnBnClickedBtnDelete)
+	ON_BN_CLICKED(IDC_CHK_ACTIVATION, &CFeatureManager::OnBnClickedBtnCheck)
 	ON_MESSAGE(MSG_SECUREINIT, &CFeatureManager::UpdateStatus)
 END_MESSAGE_MAP()
 
@@ -76,7 +78,13 @@ void CFeatureManager::SetEditLink(CString link)
 		SetDlgItemText(IDC_EDIT_DISK, link);
 }
 
+void CFeatureManager::OnBnClickedBtnCheck()
+{
+	((CButton*)GetDlgItem(IDC_CHK_ACTIVATION))->GetCheck();
+}
+
 void CFeatureManager::OnBnClickedBtnDelete()
 {
-	// TODO: Add your control notification handler code here
+	if (MessageBox(_T("삭제하시겠습니까??"), _T("삭제"), MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2) == IDYES)
+		AfxMessageBox(_T("Fail to Delete!"));
 }

@@ -20,6 +20,7 @@ public:
 	virtual void OnInitialUpdate();
 	
 	afx_msg void OnBnClickedBtnDelete();
+	afx_msg void OnBnClickedBtnCheck();
 	afx_msg LRESULT UpdateStatus(WPARAM wparam, LPARAM lparam);
 public:
 	void ButtonStatusInit(BOOL IsStatus);
@@ -28,4 +29,5 @@ public:
 public:
 	CButton m_chActivation;
 	CEdit m_editDistk;
+	CProgressCtrl m_Progress;
 };

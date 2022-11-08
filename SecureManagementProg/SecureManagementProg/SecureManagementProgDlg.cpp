@@ -497,7 +497,7 @@ BOOL CSecureManagementProgDlg::IsInstall(CString secname)
 	if (secname == "AhnLab Safe Transaction Application")
 		m_mayLink.Format(_T("C:\\Program Files\\AhnLab\\Safe Transaction\\stsess.exe"));
 	else if (secname == "veraport G3")
-		m_mayLink.Format(_T("C:\\Program Files\\Wizvera\\Veraport20\\veraport - x64.exe"));
+		m_mayLink.Format(_T("C:\\Program Files\\Wizvera\\Veraport20\\veraport-x64.exe"));
 	else if (secname == "TouchEn nxKey")
 		m_mayLink.Format(_T("C:\\Users\\KOREA\\Downloads\\TouchEn_nxKey_32bit.exe"));
 
