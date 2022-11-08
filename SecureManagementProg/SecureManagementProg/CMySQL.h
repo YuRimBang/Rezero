@@ -20,12 +20,15 @@ public:
 	MYSQL*					GetConnection() { return m_connection; };	//DB Connect
 
 public:
+	char*						 CStringToChar(CString csting);		//CString -> char* 데이터타입 변환
+
 	BOOL					ConnectToDB(MYSQL* mysql);		//DB연결
-	
+	BOOL					Isinit(CString orgincst, CString findcst);
+
 	VOID						Finish_with_error(MYSQL* con);	//mysql 연결 실패시 error
 	VOID						FreeSQL(MYSQL_RES* res);			//mysql 연결 해제
 	
-	char*						CStringToChar(CString csting);		//CString -> char* 데이터타입 변환
+
 };
 
 class CPlatform : public CMySQL
@@ -47,7 +50,9 @@ protected:
 
 
 public:
+	virtual MYSQL*		GetConnection() { return m_connection; };
 	virtual BOOL			ConnectToDB();
+	virtual BOOL			Isinit(CString orgincst, CString findcst);
 
 	/*Setter*/
 	void						SetFindVar(CString cstFindvar) { m_cstFindPlaform = cstFindvar; };
@@ -56,13 +61,11 @@ public:
 	void						GetColumns(MYSQL* connect, vector<CString>* SecureProgram, vector<CString>* Plaformname, vector<CString>* PlatformType);
 	void						GetFieldsNum(MYSQL_RES* res);
 	
-	MYSQL*					GetConnection() { return m_connection; };
-	
 	CString					GetName() { return m_cstName; }
 	CString					GetType() { return m_cstType; }
 	CString					GetCode() { return m_cstCode; }
 
-	BOOL					Isinit(CString orgincst, CString findcst);
+
 };
 
 class CSecurityProg : public CMySQL
@@ -81,20 +84,44 @@ protected:
 	CString					m_cstInstall;				//설치 필수/선택
 
 	INT						m_nFieldsCnt;				//필드 갯수
+
 public:
+	virtual MYSQL*		GetConnection() { return m_connection; };
 	virtual BOOL			ConnectToDB();
-	BOOL					Isinit(CString orgincst, CString findcst);
+	virtual BOOL			Isinit(CString orgincst, CString findcst);
+	
 	/*Setter*/
 	void						SetFindVar(CString cstFindvar) { m_cstFindPlaform = cstFindvar; };
 
 	/*Getter*/
 	void						GetColumns(MYSQL* connect, vector<CString>* SecureProgname, vector<CString> PfCode, vector<CString>* Install);
 	void						GetFieldsNum(MYSQL_RES* res);
-
-	MYSQL* GetConnection() { return m_connection; };
-
 	CString					GetName() { return m_cstName; }
 	CString					GetInstall() { return m_cstInstall; }
 	CString					GetCode() { return m_cstCode; }
 
+	
+};
+
+class CPlatformInformation : public CMySQL
+{
+public:
+	CPlatformInformation();
+	virtual ~CPlatformInformation();
+
+protected:
+	CString					m_cstTablename;		//테이블 이름
+	CString					m_cstPfCode;				//플랫폼 코드
+	CString					m_cstSite;					//플랫폼 사이트
+	CString					m_cstImg;					//플랫폼 이미지링크
+
+	INT						m_nFieldsCnt;				//필드 갯수
+
+public:
+	virtual MYSQL*		GetConnection() { return m_connection; };
+	virtual BOOL			ConnectToDB();
+	virtual BOOL			Isinit(CString orgincst, CString findcst);
+
+	/*Getter*/
+	void						GetColumns(MYSQL* connect, CString PfCode, CString* Site, CString* Image);
 };

@@ -75,6 +75,7 @@ BOOL CCurSecureManager::OnInitDialog()
 }
 
 BEGIN_MESSAGE_MAP(CCurSecureManager, CDialogEx)
+    ON_BN_CLICKED(IDC_BTN_CURDEL, &CCurSecureManager::OnBnClickedBtnCurdel)
 END_MESSAGE_MAP()
 
 vector< CHAR > CCurSecureManager::GetKeyList(HKEY hKey)
@@ -135,4 +136,10 @@ vector< CHAR > CCurSecureManager::GetKeyList(HKEY hKey)
             }
     }
     return retval_;
+}
+
+
+void CCurSecureManager::OnBnClickedBtnCurdel()
+{
+    // TODO: Add your control notification handler code here
 }

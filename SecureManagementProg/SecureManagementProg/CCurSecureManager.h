@@ -27,4 +27,6 @@ public:
 private:
 	vector<CString> m_List;
 	vector<CHAR> GetKeyList(HKEY hKey);
+public:
+	afx_msg void OnBnClickedBtnCurdel();
 };

@@ -1,5 +1,7 @@
 #pragma once
 
+#define ARR_SIZE	1024
+
 #define MSG_START	100
 #define MSG_END	101
 

@@ -25,6 +25,7 @@ void CFeatureManager::DoDataExchange(CDataExchange* pDX)
 {
 	CFormView::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_CHK_ACTIVATION, m_chActivation);
+	DDX_Control(pDX, IDC_EDIT_DISK, m_editDistk);
 }
 
 
@@ -65,6 +66,14 @@ void CFeatureManager::ButtonStatusInit(BOOL IsStatus)
 	GetDlgItem(IDC_BTN_ABOUT)->EnableWindow(IsStatus);
 	GetDlgItem(IDC_EDIT_VOLUME)->EnableWindow(IsStatus);
 	GetDlgItem(IDC_EDIT_DISK)->EnableWindow(IsStatus);
+}
+
+void CFeatureManager::SetEditLink(CString link)
+{
+	m_editDistk.Clear();
+	SetDlgItemText(IDC_EDIT_DISK, _T(""));
+	if( link !="initial")
+		SetDlgItemText(IDC_EDIT_DISK, link);
 }
 
 void CFeatureManager::OnBnClickedBtnDelete()

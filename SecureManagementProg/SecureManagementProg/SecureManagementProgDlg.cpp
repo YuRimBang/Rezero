@@ -64,9 +64,12 @@ void CSecureManagementProgDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CB_SEARCH, m_cbSearchMenu);
 	DDX_Control(pDX, IDC_LIST_RES, m_ListCtrl);
 	DDX_Control(pDX, IDC_LISTBOX_RES, m_ListBox);
+	DDX_Control(pDX, IDC_PC_IMG, m_pcPlatformImg);
+	DDX_Control(pDX, IDC_EDIT_LINK, m_edLink);
 }
 
 BEGIN_MESSAGE_MAP(CSecureManagementProgDlg, CDialogEx)
+	ON_WM_SIZE()
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
@@ -77,7 +80,6 @@ BEGIN_MESSAGE_MAP(CSecureManagementProgDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_REFRESH, &CSecureManagementProgDlg::OnBnClickedBtnRefresh)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_RES, &CSecureManagementProgDlg::OnLvnItemchangedListRes)
 	ON_LBN_SELCHANGE(IDC_LISTBOX_RES, &CSecureManagementProgDlg::OnLbnSelchangeListboxRes)
-	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -117,7 +119,8 @@ BOOL CSecureManagementProgDlg::OnInitDialog()
 
 	COperationStatus::SetHwnd(m_hWnd); //기능별 충돌 방지핸들 초기화
 	InitSearchMenu();	//검색조건 초기화
-	//AllocForm();			//보안프로그램 관리 기능 다이얼로그 붙이기
+	AllocForm();			//보안프로그램 관리 기능 다이얼로그 붙이기
+	SetUpForDynamicLayout();
 	ConntectSQL();		//Mysql 연결
 
 	CRect rt;
@@ -129,6 +132,40 @@ BOOL CSecureManagementProgDlg::OnInitDialog()
 	m_ListCtrl.InsertColumn(2, TEXT("설치 여부"), LVCFMT_CENTER, rt.Width() * 0.2);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
+}
+
+void CSecureManagementProgDlg::SetUpForDynamicLayout()
+{
+	this->EnableDynamicLayout();
+
+	auto move_x_100 = CMFCDynamicLayout::MoveSettings{};
+	move_x_100.m_nXRatio = 100;
+
+	auto move_none = CMFCDynamicLayout::MoveSettings{};
+
+	auto size_none = CMFCDynamicLayout::SizeSettings{};
+	
+	auto size_x_100 = CMFCDynamicLayout::SizeSettings{};
+	size_x_100.m_nXRatio = 100;
+
+	auto size_both = CMFCDynamicLayout::SizeSettings{};
+	size_both.m_nXRatio = 100;
+	size_both.m_nYRatio = 100;
+
+	auto ManagerMainView = this->GetDynamicLayout();
+	ManagerMainView->Create(this);
+
+	ManagerMainView->AddItem(IDC_BTN_SEARCH, move_x_100, size_none);
+	ManagerMainView->AddItem(IDC_BTN_STATUS, move_x_100, size_none);
+	ManagerMainView->AddItem(IDC_BTN_REFRESH, move_x_100, size_none);
+	ManagerMainView->AddItem((IDC_EDIT_LINK), move_x_100, size_none);
+	ManagerMainView->AddItem((IDC_STATIC_LINK), move_x_100, size_none);
+	ManagerMainView->AddItem((IDC_PC_FEATURE), move_x_100, size_none);
+	ManagerMainView->AddItem((IDC_PC_IMG), move_x_100, size_none);
+
+	ManagerMainView->AddItem(IDC_EDIT_SEARCH, move_none, size_x_100);
+	ManagerMainView->AddItem(IDC_LIST_RES, move_none, size_both);
+	ManagerMainView->AddItem(IDC_LISTBOX_RES, move_none, size_x_100);
 }
 
 void CSecureManagementProgDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -150,14 +187,27 @@ void CSecureManagementProgDlg::OnSize(UINT nType, int cx, int cy)
 
 	if (m_Init && !m_bSubDialog)
 	{
-		AllocForm();
+		m_bSubDialog = TRUE;
 	}
 	else if (m_bSubDialog)
 	{
 		CRect rectOfPanelArea;
 		GetDlgItem(IDC_PC_FEATURE)->GetWindowRect(&rectOfPanelArea);
 		ScreenToClient(&rectOfPanelArea);
-		m_CFeatureManager->MoveWindow(rectOfPanelArea);
+		
+		CCreateContext context;
+		ZeroMemory(&context, sizeof(context));
+
+		CFeatureManager* m_pFeature = (CFeatureManager*)GetDlgItem(IDD_DIALOG1);
+		m_pFeature->MoveWindow(rectOfPanelArea);
+
+		CRect rt;
+		m_ListCtrl.GetWindowRect(&rt);
+		m_ListCtrl.SetExtendedStyle(LVS_EX_FULLROWSELECT);
+
+		m_ListCtrl.InsertColumn(0, TEXT("보안프로그램"), LVCFMT_LEFT, rt.Width() * 0.5);
+		m_ListCtrl.InsertColumn(1, TEXT("필수 / 선택"), LVCFMT_CENTER, rt.Width() * 0.3);
+		m_ListCtrl.InsertColumn(2, TEXT("설치 여부"), LVCFMT_CENTER, rt.Width() * 0.2);
 	}
 }
 
@@ -342,9 +392,12 @@ void CSecureManagementProgDlg::OnLvnItemchangedListRes(NMHDR* pNMHDR, LRESULT* p
 	POSITION pos = m_ListCtrl.GetFirstSelectedItemPosition();
 	INT nCursel = m_ListCtrl.GetNextSelectedItem(pos);
 
-	m_CFeatureManager->UpdateStatus(1,1);
-	HWND hwnd = m_CFeatureManager->GetSafeHwnd();
-	::SendMessage(hwnd, MSG_SECUREINIT, TRUE, NULL);
+	CString secname = m_ListCtrl.GetItemText(nCursel, 0);
+
+	CFeatureManager* m_pFeature = (CFeatureManager*)GetDlgItem(IDD_DIALOG1);
+	m_pFeature->UpdateStatus(IsInstall(secname), NULL);
+	m_pFeature->SetEditLink(m_mayLink);
+
 	*pResult = 0;
 }
 
@@ -354,6 +407,11 @@ void CSecureManagementProgDlg::OnLbnSelchangeListboxRes()
 	CString cstList;
 	vector<CString> SecName, PfCode, PfName, PfType, Install;
 
+	//Feature 비활성화
+	CFeatureManager* m_pFeature = (CFeatureManager*)GetDlgItem(IDD_DIALOG1);
+	m_pFeature->UpdateStatus(FALSE, NULL);
+
+	//ListBox Index 불러오기
 	INT nCursel = m_ListBox.GetCurSel();
 	if (nCursel != LB_ERR)
 		m_ListBox.GetText(nCursel, cstList);
@@ -362,17 +420,88 @@ void CSecureManagementProgDlg::OnLbnSelchangeListboxRes()
 	m_CPlatform.GetColumns(&m_connection, &PfCode, &PfName, &PfType);
 	m_CSecurityprog.GetColumns(&m_connection, &SecName, PfCode, &Install);
 
+	//클릭한 플랫폼 링크 받아오기
+	CString cstSite, cstImg;
+	m_CPlatformInformation.GetColumns(&m_connection, PfCode[0], &cstSite, &cstImg);
+	m_edLink.Clear();
+	SetDlgItemText(IDC_EDIT_LINK, cstSite);
+	
+	//클릭한 플랫폼 이미지 출력
+	CRect rtPfImg;
+	CImage Img;
+	CString SavedImgPath;
+	CDC* dc = m_pcPlatformImg.GetDC();
+	
+	SavedImgPath.Format(_T("PFImge.png"));
+	m_pcPlatformImg.GetWindowRect(&rtPfImg);
+	ScreenToClient(&rtPfImg);
+	
+	if (!m_CUrlAccess.DownloadUrlFileBuffer(cstImg, SavedImgPath))
+	{
+		AfxMessageBox(_T("Fail to download Image.."));
+	}
+	else
+	{
+		Img.Load(SavedImgPath);
+		Img.StretchBlt(dc->m_hDC, 0, 0, rtPfImg.Width(), rtPfImg.Height(), SRCCOPY);
+	}
+
+
+	ReleaseDC(dc);
+
+
+	//클릭한 플랫폼의 보안프로그램 출력
 	m_ListCtrl.DeleteAllItems();
 	INT num = m_ListCtrl.GetItemCount();
 	INT curNum(0);
+
 	for (CString name : SecName)
 	{
 		m_ListCtrl.InsertItem(num, name);
 		CString InstallChoice = (Install[curNum] == '1') ? (_T("필수")) : (_T("선택"));
 		m_ListCtrl.SetItem(num, 1, LVIF_TEXT, InstallChoice, NULL, NULL, NULL, NULL);
-		m_ListCtrl.SetItem(num, 2, LVIF_TEXT, _T("미설치"), NULL, NULL, NULL, NULL);
+		m_ListCtrl.SetItem(num, 2, LVIF_TEXT, csIsInstall(name), NULL, NULL, NULL, NULL);
 		curNum++;
 	}
+}
+
+#define _CRT_SECURE_NO_WARNINGS 1
+
+#include <io.h>
+
+BOOL CSecureManagementProgDlg::IsFileExist(CString Filename)
+{
+	return (_access(m_CMySQL.CStringToChar(Filename), 0) != -1) ? (TRUE) : (FALSE);
+}
+
+CString CSecureManagementProgDlg::csIsInstall(CString secname)
+{
+	CString _InstallationFT;
+
+	if (secname == "AhnLab Safe Transaction Application")
+		_InstallationFT = IsFileExist(_T("C:\\Program Files\\AhnLab\\Safe Transaction\\stsess.exe")) ? (_T("설치됨")) : (_T("미설치"));
+	else if (secname == "veraport G3")
+		_InstallationFT = IsFileExist(_T("C:\\Program Files\\Wizvera\\Veraport20\\veraport-x64.exe")) ? (_T("설치됨")) : (_T("미설치"));
+	else if(secname =="TouchEn nxKey")
+		_InstallationFT = IsFileExist(_T("C:\\Users\\KOREA\\Downloads\\TouchEn_nxKey_32bit.exe")) ? (_T("설치됨")) : (_T("미설치"));
+	else
+		_InstallationFT.Format(_T("미설치"));
+
+	return _InstallationFT;
+}
+
+BOOL CSecureManagementProgDlg::IsInstall(CString secname)
+{
+	if (!m_mayLink.IsEmpty())
+		m_mayLink.Format(_T("initial"));
+	if (secname == "AhnLab Safe Transaction Application")
+		m_mayLink.Format(_T("C:\\Program Files\\AhnLab\\Safe Transaction\\stsess.exe"));
+	else if (secname == "veraport G3")
+		m_mayLink.Format(_T("C:\\Program Files\\Wizvera\\Veraport20\\veraport - x64.exe"));
+	else if (secname == "TouchEn nxKey")
+		m_mayLink.Format(_T("C:\\Users\\KOREA\\Downloads\\TouchEn_nxKey_32bit.exe"));
+
+	return IsFileExist(m_mayLink);
 }
 
 

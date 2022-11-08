@@ -197,6 +197,7 @@
     <ClInclude Include="CFeatureManager.h" />
     <ClInclude Include="CMySQL.h" />
     <ClInclude Include="CRegCtrl.h" />
+    <ClInclude Include="CUrlAccess.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MenuManger.h" />
     <ClInclude Include="MySQLDefinition.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="CFeatureManager.cpp" />
     <ClCompile Include="CMySQL.cpp" />
     <ClCompile Include="CRegCtrl.cpp" />
+    <ClCompile Include="CUrlAccess.cpp" />
     <ClCompile Include="OperationStatus.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

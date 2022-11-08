@@ -23,7 +23,9 @@ public:
 	afx_msg LRESULT UpdateStatus(WPARAM wparam, LPARAM lparam);
 public:
 	void ButtonStatusInit(BOOL IsStatus);
+	void SetEditLink(CString link);
 
 public:
 	CButton m_chActivation;
+	CEdit m_editDistk;
 };

@@ -28,6 +28,14 @@ VOID CMySQL::FreeSQL(MYSQL_RES* res)
 	mysql_close(m_connection);
 }
 
+BOOL CMySQL::Isinit(CString orgincst, CString findcst)
+{
+	if (orgincst.Find(findcst) == -1)
+		return FALSE;
+	else
+		return TRUE;
+}
+
 char* CMySQL::CStringToChar(CString csting)
 {
 	wchar_t* wQuery = LPWSTR(LPCWSTR(csting));
@@ -57,19 +65,19 @@ BOOL CPlatform::ConnectToDB()
 	return (BOOL)mysql_real_connect(GetConnection(), DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, NULL, 0);
 }
 
-VOID CPlatform::GetFieldsNum(MYSQL_RES* res)
-{
-	if (res == NULL)
-		Finish_with_error(GetConnection());
-	m_nFieldsCnt = mysql_num_fields(res);
-}
-
 BOOL CPlatform::Isinit(CString orgincst, CString findcst)
 {
 	if (orgincst.Find(findcst) == -1)
 		return FALSE;
 	else
 		return TRUE;
+}
+
+VOID CPlatform::GetFieldsNum(MYSQL_RES* res)
+{
+	if (res == NULL)
+		Finish_with_error(GetConnection());
+	m_nFieldsCnt = mysql_num_fields(res);
 }
 
 void CPlatform::GetColumns(MYSQL* connect, vector<CString>* SecureProgram, vector<CString>* Plaformname, vector<CString>* PlatformType)
@@ -168,6 +176,55 @@ void CSecurityProg::GetColumns(MYSQL* connect, vector<CString>* SecureProgname, 
 	}
 	vcstSecName.swap(*SecureProgname);
 	vcstInstall.swap(*Install);
+
+	FreeSQL(result);
+}
+
+//CPlatformInformation class
+
+CPlatformInformation::CPlatformInformation()
+	: CMySQL()
+	, m_cstTablename(L"platforminformation")
+	, m_nFieldsCnt(0)
+{
+}
+
+CPlatformInformation::~CPlatformInformation()
+{
+}
+
+BOOL CPlatformInformation::ConnectToDB()
+{
+	m_connection = mysql_init(NULL);
+	return (BOOL)mysql_real_connect(GetConnection(), DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, NULL, 0);
+}
+
+BOOL CPlatformInformation::Isinit(CString orgincst, CString findcst)
+{
+	if (orgincst.Find(findcst) == -1)
+		return FALSE;
+	else
+		return TRUE;
+}
+
+void CPlatformInformation::GetColumns(MYSQL* connect, CString PfCode, CString* Site, CString* Image)
+{
+	mysql_query(connect, "set names euckr");
+	if (mysql_query(connect, "SELECT * FROM platforminformation"))
+		Finish_with_error(connect);
+	MYSQL_RES* result = mysql_store_result(connect);
+
+	CString	vcstSite, vcstImg;
+	MYSQL_ROW			row;
+
+	while (row = mysql_fetch_row(result))
+	{
+		if (PfCode == row[0])
+		{
+			*Site = row[1];
+			*Image = row[2];
+		}
+	}
 
 	FreeSQL(result);
 }
