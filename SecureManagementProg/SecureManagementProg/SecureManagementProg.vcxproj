@@ -196,12 +196,13 @@
     <ClInclude Include="CCurSecureManager.h" />
     <ClInclude Include="CFeatureManager.h" />
     <ClInclude Include="CMySQL.h" />
-    <ClInclude Include="CPCControl.h" />
     <ClInclude Include="CRegCtrl.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="MenuManger.h" />
     <ClInclude Include="MySQLDefinition.h" />
+    <ClInclude Include="OperationStatus.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ProgressManager.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="SecureManagementProg.h" />
     <ClInclude Include="SecureManagementProgDlg.h" />
@@ -211,8 +212,8 @@
     <ClCompile Include="CCurSecureManager.cpp" />
     <ClCompile Include="CFeatureManager.cpp" />
     <ClCompile Include="CMySQL.cpp" />
-    <ClCompile Include="CPCControl.cpp" />
     <ClCompile Include="CRegCtrl.cpp" />
+    <ClCompile Include="OperationStatus.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

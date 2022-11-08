@@ -53,7 +53,7 @@ public:
 	void						SetFindVar(CString cstFindvar) { m_cstFindPlaform = cstFindvar; };
 
 	/*Getter*/
-	void						GetColumns(MYSQL* connect, vector<CString>* findVar, vector<CString>* Plaformname);
+	void						GetColumns(MYSQL* connect, vector<CString>* SecureProgram, vector<CString>* Plaformname, vector<CString>* PlatformType);
 	void						GetFieldsNum(MYSQL_RES* res);
 	
 	MYSQL*					GetConnection() { return m_connection; };
@@ -83,12 +83,12 @@ protected:
 	INT						m_nFieldsCnt;				//ÇÊµå °¹¼ö
 public:
 	virtual BOOL			ConnectToDB();
-
+	BOOL					Isinit(CString orgincst, CString findcst);
 	/*Setter*/
 	void						SetFindVar(CString cstFindvar) { m_cstFindPlaform = cstFindvar; };
 
 	/*Getter*/
-	void						GetColumns(MYSQL* connect, vector<CString>* name, vector<CString> Findvar);
+	void						GetColumns(MYSQL* connect, vector<CString>* SecureProgname, vector<CString> PfCode, vector<CString>* Install);
 	void						GetFieldsNum(MYSQL_RES* res);
 
 	MYSQL* GetConnection() { return m_connection; };
@@ -97,5 +97,4 @@ public:
 	CString					GetInstall() { return m_cstInstall; }
 	CString					GetCode() { return m_cstCode; }
 
-	/*Setter*/
 };

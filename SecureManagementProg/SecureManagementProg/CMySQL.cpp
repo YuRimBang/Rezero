@@ -72,36 +72,39 @@ BOOL CPlatform::Isinit(CString orgincst, CString findcst)
 		return TRUE;
 }
 
-void CPlatform::GetColumns(MYSQL* connect, vector<CString>* findVar, vector<CString>* Plaformname)
-{
+void CPlatform::GetColumns(MYSQL* connect, vector<CString>* SecureProgram, vector<CString>* Plaformname, vector<CString>* PlatformType)
+{	
 	MYSQL_ROW row;
-	CString cstName;	//포함되어있는지 확인하기위한 변수
-	vector<CString>		vcstPfcode;
+	vector<CString>		vcstPfcode, vcstType, vcstName;
 
 	mysql_query(connect, "set names euckr");
 	if (mysql_query(connect, "SELECT * FROM platform"))
 		Finish_with_error(connect);
 	MYSQL_RES* result = mysql_store_result(connect);
-	GetFieldsNum(result);
-
 
 	while (row = mysql_fetch_row(result))
 	{
-		cstName = row[1];
+		CString cstName;
+		cstName  = row[1]; //포함되어있는지 확인하기위한 변수
 		if(Isinit(cstName, m_cstFindPlaform))
 		{
 			m_cstCode = row[0];
-			m_cstName = cstName;
+			m_cstName = row[1];
 			m_cstType = row[2];
 
 			vcstPfcode.push_back(m_cstCode);
-			Plaformname->push_back(m_cstName);
+			vcstName.push_back(m_cstName);
+			vcstType.push_back(m_cstType);
 		}
 	}
 	
-	vcstPfcode.swap(*findVar);
+	vcstPfcode.swap(*SecureProgram);
+	vcstName.swap(*Plaformname);
+	vcstPfcode.swap(*PlatformType);
+	
 	FreeSQL(result);
 }
+
 
 //CSecurityProg class
 
@@ -129,7 +132,15 @@ VOID CSecurityProg::GetFieldsNum(MYSQL_RES* res)
 	m_nFieldsCnt = mysql_num_fields(res);
 }
 
-void CSecurityProg::GetColumns(MYSQL* connect, vector<CString>*name, vector<CString> Findvar)
+BOOL CSecurityProg::Isinit(CString orgincst, CString findcst)
+{
+	if (orgincst.Find(findcst) == -1)
+		return FALSE;
+	else
+		return TRUE;
+}
+
+void CSecurityProg::GetColumns(MYSQL* connect, vector<CString>* SecureProgname, vector<CString> PfCode, vector<CString>* Install)
 {
 	mysql_query(connect, "set names euckr");
 	if (mysql_query(connect, "SELECT * FROM securityprog"))
@@ -137,22 +148,26 @@ void CSecurityProg::GetColumns(MYSQL* connect, vector<CString>*name, vector<CStr
 	MYSQL_RES* result = mysql_store_result(connect);
 	GetFieldsNum(result);
 
-	vector<CString>		vcstSecName;
+	vector<CString>		vcstSecName, vcstInstall;
 	MYSQL_ROW			row;
 	
 	while (row = mysql_fetch_row(result))
 	{
-		for (CString cst : Findvar)
+		m_cstCode = row[0];
+		for (CString cst : PfCode)
 		{
-			if (row[0] == cst)
-			{
-				m_cstCode = row[0];
+			if (Isinit(m_cstCode, cst))
+			{		
 				m_cstName = row[1];
-				vcstSecName.push_back(m_cstName);
 				m_cstInstall = row[2];
+
+				vcstSecName.push_back(m_cstName);
+				vcstInstall.push_back(m_cstInstall);
 			}
 		}
 	}
-	vcstSecName.swap(*name);
+	vcstSecName.swap(*SecureProgname);
+	vcstInstall.swap(*Install);
+
 	FreeSQL(result);
 }

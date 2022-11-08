@@ -60,7 +60,7 @@ LRESULT CFeatureManager::UpdateStatus(WPARAM wparam, LPARAM lparam)
 
 void CFeatureManager::ButtonStatusInit(BOOL IsStatus)
 {
-	m_chActivation.EnableWindow(IsStatus);
+ 	m_chActivation.EnableWindow(IsStatus);
 	GetDlgItem(IDC_BTN_DELETE)->EnableWindow(IsStatus);
 	GetDlgItem(IDC_BTN_ABOUT)->EnableWindow(IsStatus);
 	GetDlgItem(IDC_EDIT_VOLUME)->EnableWindow(IsStatus);
