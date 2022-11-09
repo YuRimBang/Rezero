@@ -77,7 +77,7 @@ DWORD CUrlAccess::GetUrlFileLength(CString url)
 	return filesize;
 }
 
-BOOL CUrlAccess::DownloadUrlFileBuffer(CString url, CString ImgPath)
+BOOL CUrlAccess::DownloadforUrl(CString url, CString ImgPath)
 {
 	DWORD dwServiceType = AFX_INET_SERVICE_HTTP;
 	CString szServer, szObject, szInfo;
@@ -215,7 +215,7 @@ char* CUrlAccess::CStringToChar(CString csting)
 }
 
 #define READ_BUF_SIZE    1024
-int CUrlAccess::getFileFromHttp(CString pszUrl, CString pszFile)
+INT CUrlAccess::DownloadImageFromHttp(CString pszUrl, CString pszFile)
 {
 	HINTERNET    hInet, hUrl;
 	DWORD        dwReadSize = 0;

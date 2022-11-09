@@ -51,7 +51,7 @@ BOOL CFeatureManager::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWOR
 void CFeatureManager::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
-
+	m_Progress.SetRange(0, 100);
 	ButtonStatusInit(FALSE);
 }
 

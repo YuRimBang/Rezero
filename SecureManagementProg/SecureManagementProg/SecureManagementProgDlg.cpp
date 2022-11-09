@@ -436,7 +436,7 @@ void CSecureManagementProgDlg::OnLbnSelchangeListboxRes()
 	m_pcPlatformImg.GetWindowRect(&rtPfImg);
 	ScreenToClient(&rtPfImg);
 	
-	if (!m_CUrlAccess.DownloadUrlFileBuffer(cstImg, SavedImgPath))
+	if (!m_CUrlAccess.DownloadImageFromHttp(cstImg, SavedImgPath))
 	{
 		AfxMessageBox(_T("Fail to download Image.."));
 	}
@@ -444,6 +444,7 @@ void CSecureManagementProgDlg::OnLbnSelchangeListboxRes()
 	{
 		Img.Load(SavedImgPath);
 		Img.StretchBlt(dc->m_hDC, 0, 0, rtPfImg.Width(), rtPfImg.Height(), SRCCOPY);
+		//::InvalidateRect(m_hWnd, rtPfImg, TRUE);
 	}
 
 
@@ -464,8 +465,6 @@ void CSecureManagementProgDlg::OnLbnSelchangeListboxRes()
 		curNum++;
 	}
 }
-
-#define _CRT_SECURE_NO_WARNINGS 1
 
 #include <io.h>
 
