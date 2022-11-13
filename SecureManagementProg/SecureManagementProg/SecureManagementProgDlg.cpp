@@ -262,10 +262,10 @@ void CSecureManagementProgDlg::OnPaint()
 	}
 	else
 	{
-		CRect rt;
+		CRect rt;	
 		this->GetWindowRect(&rt);
 		ScreenToClient(&rt);
-		::InvalidateRect(m_hWnd, rt, TRUE);
+		::InvalidateRect(m_hWnd, rt, TRUE); //화면 갱신함수
 
 		CDialogEx::OnPaint();
 	}
@@ -389,8 +389,8 @@ void CSecureManagementProgDlg::OnLvnItemchangedListRes(NMHDR* pNMHDR, LRESULT* p
 {
 	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
 	
-	POSITION pos = m_ListCtrl.GetFirstSelectedItemPosition();
-	INT nCursel = m_ListCtrl.GetNextSelectedItem(pos);
+	POSITION pos = m_ListCtrl.GetFirstSelectedItemPosition();	//몇번째 눌렀는지
+	INT nCursel = m_ListCtrl.GetNextSelectedItem(pos);	//pos to int
 
 	CString secname = m_ListCtrl.GetItemText(nCursel, 0);
 
@@ -417,14 +417,15 @@ void CSecureManagementProgDlg::OnLbnSelchangeListboxRes()
 		m_ListBox.GetText(nCursel, cstList);
 
 	m_CPlatform.SetFindVar(cstList);
-	m_CPlatform.GetColumns(&m_connection, &PfCode, &PfName, &PfType);
-	m_CSecurityprog.GetColumns(&m_connection, &SecName, PfCode, &Install);
+
+	m_CPlatform.GetColumns(&m_connection, &PfCode, &PfName, &PfType);	//선택한 플랫폼 코드 받아오기
+	m_CSecurityprog.GetColumns(&m_connection, &SecName, PfCode, &Install);	//선택한 플랫폼 보안프로그램 받아오기
 
 	//클릭한 플랫폼 링크 받아오기
 	CString cstSite, cstImg;
 	m_CPlatformInformation.GetColumns(&m_connection, PfCode[0], &cstSite, &cstImg);
 	m_edLink.Clear();
-	SetDlgItemText(IDC_EDIT_LINK, cstSite);
+	SetDlgItemText(IDC_EDIT_LINK, cstSite);	
 	
 	//클릭한 플랫폼 이미지 출력
 	CRect rtPfImg;
@@ -442,17 +443,15 @@ void CSecureManagementProgDlg::OnLbnSelchangeListboxRes()
 	}
 	else
 	{
-		Img.Load(SavedImgPath);
-		Img.StretchBlt(dc->m_hDC, 0, 0, rtPfImg.Width(), rtPfImg.Height(), SRCCOPY);
+		Img.Load(SavedImgPath);		//이미지출력
+		Img.StretchBlt(dc->m_hDC, 0, 0, rtPfImg.Width(), rtPfImg.Height(), SRCCOPY);	//이미지 리사이징
 		//::InvalidateRect(m_hWnd, rtPfImg, TRUE);
 	}
 
-
 	ReleaseDC(dc);
 
-
 	//클릭한 플랫폼의 보안프로그램 출력
-	m_ListCtrl.DeleteAllItems();
+	m_ListCtrl.DeleteAllItems();		//출력된것 지우기
 	INT num = m_ListCtrl.GetItemCount();
 	INT curNum(0);
 

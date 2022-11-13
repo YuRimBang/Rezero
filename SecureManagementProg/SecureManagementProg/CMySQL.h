@@ -42,6 +42,8 @@ protected:
 	
 	CString					m_cstFindPlaform;		//사용자가 찾는 이름
 	CString					m_cstTablename;		//테이블 이름
+	
+	/*Column*/
 	CString					m_cstCode;				//플랫폼 코드
 	CString					m_cstName;				//플랫폼 이름
 	CString					m_cstType;				//플랫폼 타입
@@ -79,6 +81,8 @@ protected:
 
 	CString					m_cstFindPlaform;		//사용자가 찾는 이름
 	CString					m_cstTablename;		//테이블 이름
+	
+	/*Column*/
 	CString					m_cstCode;				//플랫폼 코드
 	CString					m_cstName;				//보안프로그램 이름
 	CString					m_cstInstall;				//설치 필수/선택

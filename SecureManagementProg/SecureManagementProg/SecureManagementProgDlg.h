@@ -31,10 +31,13 @@ public:
 protected:
 	MYSQL							m_connection;
 	HICON							m_hIcon;
+	
+	/*mysql table*/
 	CMySQL							m_CMySQL;
 	CSecurityProg					m_CSecurityprog;
 	CPlatform						m_CPlatform;
 	CPlatformInformation		m_CPlatformInformation;
+	
 	CUrlAccess					m_CUrlAccess;
 	CFeatureManager*			m_pCFeatureManager;
 	CCurSecureManager*		m_pCCurSecureManger;
@@ -46,7 +49,7 @@ protected:
 	BOOL							m_nClk;	//서칭확인
 	
 	// Generated message map functions
-	afx_msg void					OnSize(UINT nType, int cx, int cy);
+	afx_msg void					OnSize(UINT nType, int cx, int cy);		//Dailog size
 	afx_msg void					OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void					OnPaint();
 	afx_msg HCURSOR			OnQueryDragIcon();
@@ -55,9 +58,9 @@ protected:
 	afx_msg void					OnBnClickedBtnSearch();		//SearchButton 클릭
 	afx_msg void					OnBnClickedBtnStatus();		//StatusButton 클릭
 	afx_msg void					OnCbnSelchangeCbSearch();	//검색 제약조건 설정
-	afx_msg void					OnBnClickedBtnRefresh();
-	afx_msg void					OnLvnItemchangedListRes(NMHDR* pNMHDR, LRESULT* pResult);
-	afx_msg void					OnLbnSelchangeListboxRes();
+	afx_msg void					OnBnClickedBtnRefresh();	//Refresh Button 클릭
+	afx_msg void					OnLvnItemchangedListRes(NMHDR* pNMHDR, LRESULT* pResult);		//보안프로그램 list 클릭시 발생
+	afx_msg void					OnLbnSelchangeListboxRes();	//플랫폼 list 클릭 시 발생
 	
 	virtual BOOL					PreTranslateMessage(MSG* pMsg);
 	virtual BOOL					OnInitDialog();

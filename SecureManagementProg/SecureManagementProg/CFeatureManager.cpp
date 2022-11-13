@@ -72,7 +72,7 @@ void CFeatureManager::ButtonStatusInit(BOOL IsStatus)
 
 void CFeatureManager::SetEditLink(CString link)
 {
-	m_editDistk.Clear();
+	m_editDistk.Clear();		//edit창 지우기
 	SetDlgItemText(IDC_EDIT_DISK, _T(""));
 	if( link !="initial")
 		SetDlgItemText(IDC_EDIT_DISK, link);

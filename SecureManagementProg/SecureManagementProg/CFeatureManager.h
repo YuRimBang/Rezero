@@ -19,12 +19,12 @@ public:
 	virtual BOOL Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext = NULL);
 	virtual void OnInitialUpdate();
 	
-	afx_msg void OnBnClickedBtnDelete();
-	afx_msg void OnBnClickedBtnCheck();
+	afx_msg void OnBnClickedBtnDelete();	//Delete Button
+	afx_msg void OnBnClickedBtnCheck();	//Activation checkbox
 	afx_msg LRESULT UpdateStatus(WPARAM wparam, LPARAM lparam);
 public:
-	void ButtonStatusInit(BOOL IsStatus);
-	void SetEditLink(CString link);
+	void ButtonStatusInit(BOOL IsStatus);	//버튼 상태 초기화
+	void SetEditLink(CString link);	//플랫폼 링크 출력
 
 public:
 	CButton m_chActivation;
