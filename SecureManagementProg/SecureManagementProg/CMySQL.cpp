@@ -113,6 +113,30 @@ void CPlatform::GetColumns(MYSQL* connect, vector<CString>* SecureProgram, vecto
 	FreeSQL(result);
 }
 
+vector<CString> CPlatform::GetPfNamebyCode(MYSQL* connect, vector<CString> PfCode)
+{
+	MYSQL_ROW			row;
+	vector<CString>		vcstName;
+
+	mysql_query(connect, "set names euckr");
+	if (mysql_query(connect, "SELECT * FROM platform"))
+		Finish_with_error(connect);
+	MYSQL_RES* result = mysql_store_result(connect);
+
+	while (row = mysql_fetch_row(result))
+	{
+		for (CString code : PfCode)
+		{
+			if (row[0]== code)
+			{
+				m_cstName = row[1];
+				vcstName.push_back(m_cstName);
+			}
+		}
+	}
+	FreeSQL(result);
+	return vcstName;
+}
 
 //CSecurityProg class
 
@@ -178,6 +202,26 @@ void CSecurityProg::GetColumns(MYSQL* connect, vector<CString>* SecureProgname, 
 	vcstInstall.swap(*Install);
 
 	FreeSQL(result);
+}
+
+vector<CString> CSecurityProg::GetPlatformbySec(MYSQL* connect, CString cstSecname)
+{
+	mysql_query(connect, "set names euckr");
+	if (mysql_query(connect, "SELECT * FROM securityprog"))
+		Finish_with_error(connect);
+	MYSQL_RES*			result = mysql_store_result(connect);
+	MYSQL_ROW			row;
+
+	vector<CString>			vcstPlatformcode;
+	while (row = mysql_fetch_row(result))
+	{
+		if (row[1]== cstSecname)
+		{
+			m_cstCode = row[0];
+			vcstPlatformcode.push_back(m_cstCode);
+		}
+	}
+	return vcstPlatformcode;
 }
 
 //CPlatformInformation class

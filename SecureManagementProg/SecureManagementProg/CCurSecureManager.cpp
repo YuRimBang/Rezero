@@ -40,9 +40,13 @@ BOOL CCurSecureManager::OnInitDialog()
 	TCHAR szDefaultPath[_MAX_PATH] = { 0 };
 	DWORD dwBufLen = MAX_PATH;
 	LSTATUS	RegOpen = ERROR_SUCCESS;
+    CString cstRegistPath;
+    FILETIME filetime;
+
+    cstRegistPath.Format(L"Software\\Microsoft\\Windows\\CurrentVersion\\Run");
 
 	RegOpen = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-		L"Software\\Microsoft\\Windows\\CurrentVersion\\Run", 0, KEY_READ, &hKey);
+        cstRegistPath, 0, KEY_READ, &hKey);
 
 	if (RegOpen == ERROR_SUCCESS)
 	{
@@ -51,22 +55,32 @@ BOOL CCurSecureManager::OnInitDialog()
 		CString sValName = _T("AhnLab Safe Transaction Application");
 		CString var;
 
-		
+        long res = RegQueryInfoKey(hKey, NULL, 0, 0,NULL, NULL, NULL, &dwBufLen, NULL, NULL, NULL,&filetime);
+        var.Format(_T("%ld"), res);
+        AfxMessageBox(var);
 		TCHAR atcvalue[MAX_PATH];
 		::ZeroMemory(atcvalue, sizeof(atcvalue));
 
-		RegOpen = ::RegQueryValueEx(hKey, NULL, NULL, NULL, (LPBYTE)atcvalue, &dwBufLen);
 
-        for (CHAR ch : GetKeyList(hKey))
+		RegOpen = ::RegQueryValueEx(hKey, NULL, NULL, NULL, (LPBYTE)atcvalue, &dwBufLen);
+        if (RegOpen == ERROR_SUCCESS)
         {
-            AfxMessageBox(_T(" %s", ch));
-       }
+            CString sResult;
+            sResult = atcvalue;
+            delete atcvalue;
+        }
+
+       // for (CHAR ch : GetKeyList(hKey))
+       // {
+       //     AfxMessageBox(_T(" %s", ch));
+       //}
 	}
 	else
 		AfxMessageBox(_T("Fail to Access Regist"));
 
 	//RegQueryValueEx(hKey,L"ProgramFilesDir", NULL, NULL, (LPBYTE)szDefaultPath, &dwBufLen);
 	RegCloseKey(hKey);
+
 	//CString m_strBaseFindDir = CString(szDefaultPath) + CString("/NPKI/");
 	//CString m_strBaseFindPath = CString(szDefaultPath) + CString("/NPKI/*.*");
 

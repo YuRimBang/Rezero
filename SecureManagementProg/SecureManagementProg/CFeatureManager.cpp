@@ -32,6 +32,7 @@ void CFeatureManager::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CFeatureManager, CFormView)
 	ON_BN_CLICKED(IDC_BTN_DELETE, &CFeatureManager::OnBnClickedBtnDelete)
+	ON_BN_CLICKED(IDC_BTN_ABOUT, &CFeatureManager::OnBnClickedBtnAbout)
 	ON_BN_CLICKED(IDC_CHK_ACTIVATION, &CFeatureManager::OnBnClickedBtnCheck)
 	ON_MESSAGE(MSG_SECUREINIT, &CFeatureManager::UpdateStatus)
 END_MESSAGE_MAP()
@@ -65,7 +66,7 @@ void CFeatureManager::ButtonStatusInit(BOOL IsStatus)
 {
  	m_chActivation.EnableWindow(IsStatus);
 	GetDlgItem(IDC_BTN_DELETE)->EnableWindow(IsStatus);
-	GetDlgItem(IDC_BTN_ABOUT)->EnableWindow(IsStatus);
+	//GetDlgItem(IDC_BTN_ABOUT)->EnableWindow(IsStatus);
 	GetDlgItem(IDC_EDIT_VOLUME)->EnableWindow(IsStatus);
 	GetDlgItem(IDC_EDIT_DISK)->EnableWindow(IsStatus);
 }
@@ -87,4 +88,11 @@ void CFeatureManager::OnBnClickedBtnDelete()
 {
 	if (MessageBox(_T("삭제하시겠습니까??"), _T("삭제"), MB_YESNO | MB_ICONINFORMATION | MB_DEFBUTTON2) == IDYES)
 		AfxMessageBox(_T("Fail to Delete!"));
+}
+
+void CFeatureManager::OnBnClickedBtnAbout()
+{
+	m_pCAboutBox = new CAboutBox();
+	m_pCAboutBox->SetCodeList(m_vnPfCode);
+	m_pCAboutBox->DoModal();
 }

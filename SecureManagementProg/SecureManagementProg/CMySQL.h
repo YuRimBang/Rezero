@@ -63,6 +63,8 @@ public:
 	void						GetColumns(MYSQL* connect, vector<CString>* SecureProgram, vector<CString>* Plaformname, vector<CString>* PlatformType);
 	void						GetFieldsNum(MYSQL_RES* res);
 	
+	vector<CString>		GetPfNamebyCode(MYSQL* connect, vector<CString> PfCode);
+	
 	CString					GetName() { return m_cstName; }
 	CString					GetType() { return m_cstType; }
 	CString					GetCode() { return m_cstCode; }
@@ -103,7 +105,7 @@ public:
 	CString					GetName() { return m_cstName; }
 	CString					GetInstall() { return m_cstInstall; }
 	CString					GetCode() { return m_cstCode; }
-
+	vector<CString>			GetPlatformbySec(MYSQL* connect, CString cstSecname);
 	
 };
 

@@ -43,7 +43,8 @@ protected:
 	CCurSecureManager*		m_pCCurSecureManger;
 	CFeatureManager*			m_CFeatureManager;
 	CComboBox					m_cbSearchMenu;	//검색조건 Combobox
-
+	CComboBox					m_cbInternet;
+	
 	BOOL							m_Init;
 	BOOL							m_bSubDialog;
 	BOOL							m_nClk;	//서칭확인
@@ -72,14 +73,19 @@ protected:
 	void								SetUpForDynamicLayout();
 	void								ConntectSQL();	//SQL연결
 	void								InitSearchMenu();	//검색 조건 초기화
+	void								InitInternetMenu();	//인터넷
 	void								AllocForm();	//Feature Dlg 메인 다이얼로그에 붙이기
 	void								SearchSecureProgram();
-	
+	void								DrawImage(CString img);
+
 	BOOL							IsFileExist(CString Filename);	//파일이 존재하는지
 	CString							csIsInstall(CString secname);
 	BOOL							IsInstall(CString secname);
 	static UINT						ThreadSearchSecureprog(LPVOID pParam);
 public:
+	CString							m_cstInternet;	//사용할 하이퍼링크 실행파일
+	CString							m_cstImg;
+	CString							m_cstSite;	//현재 플랫폼 링크
 	CString							m_mayLink;	//임시 저장소 링크
 	CListBox						m_ListBox;
 	CListCtrl							m_ListCtrl;
@@ -92,4 +98,6 @@ public:
 
 	CStatic m_pcPlatformImg;
 	CEdit m_edLink;
+	afx_msg void OnStnClickedStaticHyperlink();
+	afx_msg void OnCbnSelchangeCbInternet();
 };

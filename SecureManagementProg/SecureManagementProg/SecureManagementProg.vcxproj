@@ -193,6 +193,7 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CAboutBox.h" />
     <ClInclude Include="CCurSecureManager.h" />
     <ClInclude Include="CFeatureManager.h" />
     <ClInclude Include="CMySQL.h" />
@@ -210,6 +211,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CAboutBox.cpp" />
     <ClCompile Include="CCurSecureManager.cpp" />
     <ClCompile Include="CFeatureManager.cpp" />
     <ClCompile Include="CMySQL.cpp" />

@@ -13,4 +13,12 @@ enum SEARCH	//검색조건
 	SECURE					//보안프로그램
 };
 
+enum INTERNET
+{
+	CHROME,
+	EXPLORE,
+	MICOROSOFT_EDGE,
+	WHALE
+};
+
 #define MSG_SECUREINIT			(WM_USER + 100)

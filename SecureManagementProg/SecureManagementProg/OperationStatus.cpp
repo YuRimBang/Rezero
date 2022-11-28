@@ -56,6 +56,21 @@ BOOL COperationStatus::SetRefresh(BOOL bStatus)
     return TRUE;
 }
 
+BOOL COperationStatus::SetAccess(BOOL bStatus)
+{
+    if (bStatus == TRUE && CheckOperationStatus() == S_FALSE)
+        return FALSE;
+
+    m_bSearching = bStatus;
+
+    if (bStatus == TRUE)
+        ::SendMessage(m_hMsgHwnd, MSG_PROGRESS_UPDATE, MSG_PROGRESS_ACCESS, MSG_START);
+    if (bStatus == FALSE)
+        ::SendMessage(m_hMsgHwnd, MSG_PROGRESS_UPDATE, MSG_PROGRESS_ACCESS, MSG_END);
+
+    return TRUE;
+}
+
 HRESULT COperationStatus::CheckOperationStatus()
 {
     if (m_bSearching == TRUE || m_bDelete == TRUE || m_bRefresh == TRUE )

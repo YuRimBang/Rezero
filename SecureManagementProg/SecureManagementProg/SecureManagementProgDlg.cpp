@@ -54,6 +54,7 @@ CSecureManagementProgDlg::CSecureManagementProgDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_SECUREMANAGEMENTPROG_DIALOG, pParent)
 	, m_nClk(FALSE)
 	, m_Init(FALSE)
+	, m_cstInternet(_T("chrome.exe"))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -66,6 +67,7 @@ void CSecureManagementProgDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_LISTBOX_RES, m_ListBox);
 	DDX_Control(pDX, IDC_PC_IMG, m_pcPlatformImg);
 	DDX_Control(pDX, IDC_EDIT_LINK, m_edLink);
+	DDX_Control(pDX, IDC_CB_INTERNET, m_cbInternet);
 }
 
 BEGIN_MESSAGE_MAP(CSecureManagementProgDlg, CDialogEx)
@@ -80,6 +82,8 @@ BEGIN_MESSAGE_MAP(CSecureManagementProgDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BTN_REFRESH, &CSecureManagementProgDlg::OnBnClickedBtnRefresh)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_RES, &CSecureManagementProgDlg::OnLvnItemchangedListRes)
 	ON_LBN_SELCHANGE(IDC_LISTBOX_RES, &CSecureManagementProgDlg::OnLbnSelchangeListboxRes)
+	ON_STN_CLICKED(IDC_STATIC_HYPERLINK, &CSecureManagementProgDlg::OnStnClickedStaticHyperlink)
+	ON_CBN_SELCHANGE(IDC_CB_INTERNET, &CSecureManagementProgDlg::OnCbnSelchangeCbInternet)
 END_MESSAGE_MAP()
 
 
@@ -119,8 +123,10 @@ BOOL CSecureManagementProgDlg::OnInitDialog()
 
 	COperationStatus::SetHwnd(m_hWnd); //기능별 충돌 방지핸들 초기화
 	InitSearchMenu();	//검색조건 초기화
+	InitInternetMenu();
 	AllocForm();			//보안프로그램 관리 기능 다이얼로그 붙이기
-	SetUpForDynamicLayout();
+	SetUpForDynamicLayout();	//DynamicLayout
+	GetDlgItem(IDC_STATIC_HYPERLINK)->SetWindowTextW(L"사이트 바로가기");	//사이트
 	ConntectSQL();		//Mysql 연결
 
 	CRect rt;
@@ -162,6 +168,8 @@ void CSecureManagementProgDlg::SetUpForDynamicLayout()
 	ManagerMainView->AddItem((IDC_STATIC_LINK), move_x_100, size_none);
 	ManagerMainView->AddItem((IDC_PC_FEATURE), move_x_100, size_none);
 	ManagerMainView->AddItem((IDC_PC_IMG), move_x_100, size_none);
+	ManagerMainView->AddItem((IDC_CB_INTERNET), move_x_100, size_none);
+	ManagerMainView->AddItem((IDC_STATIC_HYPERLINK), move_x_100, size_none);
 
 	ManagerMainView->AddItem(IDC_EDIT_SEARCH, move_none, size_x_100);
 	ManagerMainView->AddItem(IDC_LIST_RES, move_none, size_both);
@@ -227,10 +235,19 @@ LRESULT CSecureManagementProgDlg::OnProgressUpdate(WPARAM wParam, LPARAM lParam)
 			break;
 		case MSG_PROGRESS_REFRESH:
 			break;
+		case MSG_PROGRESS_ACCESS:
+			GetDlgItem(IDC_STATIC_HYPERLINK)->SetWindowTextW(L"접속중...");
+			break;
 		}
 	}
-	else
+	else if(lParam ==MSG_END)
 	{
+		switch (wParam)
+		{
+		case MSG_PROGRESS_ACCESS:
+			GetDlgItem(IDC_STATIC_HYPERLINK)->SetWindowTextW(L"사이트 바로가기");
+			break;
+		}
 	}
 
 	return LRESULT();
@@ -262,10 +279,8 @@ void CSecureManagementProgDlg::OnPaint()
 	}
 	else
 	{
-		CRect rt;	
-		this->GetWindowRect(&rt);
-		ScreenToClient(&rt);
-		::InvalidateRect(m_hWnd, rt, TRUE); //화면 갱신함수
+		if (!m_cstImg.IsEmpty())
+			DrawImage(m_cstImg);
 
 		CDialogEx::OnPaint();
 	}
@@ -290,6 +305,16 @@ void CSecureManagementProgDlg::InitSearchMenu()
 	m_cbSearchMenu.AddString(_T("보안프로그램"));
 
 	m_cbSearchMenu.SetCurSel(0);
+}
+
+void CSecureManagementProgDlg::InitInternetMenu()
+{
+	m_cbInternet.AddString(_T("크롬"));
+	m_cbInternet.AddString(_T("익스플로어"));
+	m_cbInternet.AddString(_T("마이크로소프트 에지"));
+	m_cbInternet.AddString(_T("네이버 웨일"));
+
+	m_cbInternet.SetCurSel(0);
 }
 
 void CSecureManagementProgDlg::AllocForm()
@@ -343,9 +368,6 @@ void CSecureManagementProgDlg::SearchSecureProgram()
 	{
 		m_ListBox.AddString(name);
 	}
-
-
-
 }
 
 void CSecureManagementProgDlg::OnBnClickedBtnStatus()
@@ -381,14 +403,21 @@ void CSecureManagementProgDlg::OnBnClickedBtnRefresh()
 {
 	COperationStatus::SetRefresh(TRUE);
 	UpdateData(TRUE);
+	::InvalidateRect(m_hWnd, NULL, FALSE);
+	UpdateWindow();
+	
+	m_ListBox.ResetContent();
+	m_ListCtrl.DeleteAllItems();
+	m_edLink.Clear();
+
 	COperationStatus::SetRefresh(FALSE);
 }
 
 
 void CSecureManagementProgDlg::OnLvnItemchangedListRes(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);
-	
+	vector<CString> vPfCode;
+	LPNMLISTVIEW pNMLV = reinterpret_cast<LPNMLISTVIEW>(pNMHDR);	
 	POSITION pos = m_ListCtrl.GetFirstSelectedItemPosition();	//몇번째 눌렀는지
 	INT nCursel = m_ListCtrl.GetNextSelectedItem(pos);	//pos to int
 
@@ -397,7 +426,9 @@ void CSecureManagementProgDlg::OnLvnItemchangedListRes(NMHDR* pNMHDR, LRESULT* p
 	CFeatureManager* m_pFeature = (CFeatureManager*)GetDlgItem(IDD_DIALOG1);
 	m_pFeature->UpdateStatus(IsInstall(secname), NULL);
 	m_pFeature->SetEditLink(m_mayLink);
-
+	m_pFeature->GetSecname(&secname);
+	vPfCode.swap(m_CPlatform.GetPfNamebyCode(&m_connection, m_CSecurityprog.GetPlatformbySec(&m_connection, secname)));
+	m_pFeature->GetCode(&vPfCode);
 	*pResult = 0;
 }
 
@@ -424,6 +455,7 @@ void CSecureManagementProgDlg::OnLbnSelchangeListboxRes()
 	//클릭한 플랫폼 링크 받아오기
 	CString cstSite, cstImg;
 	m_CPlatformInformation.GetColumns(&m_connection, PfCode[0], &cstSite, &cstImg);
+	m_cstSite = cstSite;
 	m_edLink.Clear();
 	SetDlgItemText(IDC_EDIT_LINK, cstSite);	
 	
@@ -443,6 +475,7 @@ void CSecureManagementProgDlg::OnLbnSelchangeListboxRes()
 	}
 	else
 	{
+		m_cstImg =SavedImgPath;
 		Img.Load(SavedImgPath);		//이미지출력
 		Img.StretchBlt(dc->m_hDC, 0, 0, rtPfImg.Width(), rtPfImg.Height(), SRCCOPY);	//이미지 리사이징
 		//::InvalidateRect(m_hWnd, rtPfImg, TRUE);
@@ -463,6 +496,17 @@ void CSecureManagementProgDlg::OnLbnSelchangeListboxRes()
 		m_ListCtrl.SetItem(num, 2, LVIF_TEXT, csIsInstall(name), NULL, NULL, NULL, NULL);
 		curNum++;
 	}
+}
+
+void CSecureManagementProgDlg::DrawImage(CString img)
+{
+	CImage Img;
+	Img.Load(img);		//이미지출력
+
+	CRect pcRect;
+	GetDlgItem(IDC_PC_IMG)->GetClientRect(&pcRect);
+
+	Img.StretchBlt(GetDlgItem(IDC_PC_IMG)->GetDC()->m_hDC, 0, 0, pcRect.Width(), pcRect.Height(), SRCCOPY);	//이미지 리사이징
 }
 
 #include <io.h>
@@ -503,4 +547,38 @@ BOOL CSecureManagementProgDlg::IsInstall(CString secname)
 }
 
 
+void CSecureManagementProgDlg::OnStnClickedStaticHyperlink()
+{
+	if (m_cstSite.IsEmpty())
+	{
+		AfxMessageBox(_T("플랫폼을 먼저 선택해주세요:)!"));
+		return;
+	}
+	COperationStatus::SetAccess(TRUE);
+	ShellExecute(NULL, L"open", m_cstInternet, m_cstSite, NULL, SW_SHOW);
+	COperationStatus::SetAccess(FALSE);
+}
 
+
+void CSecureManagementProgDlg::OnCbnSelchangeCbInternet()
+{
+	INT nCursel;
+	nCursel = m_cbInternet.GetCurSel();
+
+	switch (nCursel)
+	{
+	case CHROME:
+		m_cstInternet = _T("chrome.exe");
+		break;
+	case EXPLORE:
+		m_cstInternet = _T("iexplore.exe");
+		break;
+	case MICOROSOFT_EDGE:
+		m_cstInternet = _T("msedge.exe");
+		break;
+	case WHALE:
+		m_cstInternet = _T("whale.exe");
+	default:
+		break;
+	}
+}
