@@ -12,6 +12,7 @@
 #define		DB_NAME			"secureprogmanagerdb"
 
 #define		DB_PORT					3306	
-#define		DB_HOST				"localhost"
+#define		DB_MYHOST				"172.30.1.2"
+#define		DB_HOST				"125.137.131.245"
 
 #define MSG_UPDATE (WM_USER + 100)

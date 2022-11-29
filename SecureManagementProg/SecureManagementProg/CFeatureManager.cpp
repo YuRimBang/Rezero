@@ -26,7 +26,6 @@ void CFeatureManager::DoDataExchange(CDataExchange* pDX)
 	CFormView::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_CHK_ACTIVATION, m_chActivation);
 	DDX_Control(pDX, IDC_EDIT_DISK, m_editDistk);
-	DDX_Control(pDX, IDC_PROGRESSBAR, m_Progress);
 }
 
 
@@ -52,7 +51,6 @@ BOOL CFeatureManager::Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWOR
 void CFeatureManager::OnInitialUpdate()
 {
 	CFormView::OnInitialUpdate();
-	m_Progress.SetRange(0, 100);
 	ButtonStatusInit(FALSE);
 }
 

@@ -10,10 +10,10 @@ CMySQL::~CMySQL()
 {
 }
 
-BOOL CMySQL::ConnectToDB(MYSQL* mysql)
+BOOL CMySQL::ConnectToDB(MYSQL* mysql, const char* host)
 {
 	mysql_init(mysql);
-	return (BOOL)mysql_real_connect(mysql, DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, NULL, 0);
+	return (BOOL)mysql_real_connect(mysql, host, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT, NULL, 0);
 }
 
 VOID CMySQL::Finish_with_error(MYSQL* con)
@@ -24,7 +24,7 @@ VOID CMySQL::Finish_with_error(MYSQL* con)
 
 VOID CMySQL::FreeSQL(MYSQL_RES* res)
 {
-	mysql_free_result(res);
+	//mysql_free_result(res);
 	mysql_close(m_connection);
 }
 
@@ -170,6 +170,30 @@ BOOL CSecurityProg::Isinit(CString orgincst, CString findcst)
 		return FALSE;
 	else
 		return TRUE;
+}
+
+void CSecurityProg::GetAllSecName(MYSQL* connect, vector<CString>* Secname)
+{
+	mysql_query(connect, "set names euckr");
+	if (mysql_query(connect, "SELECT * FROM securityprog"))
+		Finish_with_error(connect);
+	MYSQL_RES* result = mysql_store_result(connect);
+	GetFieldsNum(result);
+
+	CString sec;
+	vector<CString>		vcstSecName;
+	MYSQL_ROW			row;
+
+	while (row = mysql_fetch_row(result))
+	{
+		sec= row[1];
+		vcstSecName.push_back(sec);
+	}
+
+	sort(vcstSecName.begin(), vcstSecName.end());
+	vcstSecName.erase(unique(vcstSecName.begin(), vcstSecName.end()), vcstSecName.end());
+
+	Secname->swap(vcstSecName);
 }
 
 void CSecurityProg::GetColumns(MYSQL* connect, vector<CString>* SecureProgname, vector<CString> PfCode, vector<CString>* Install)

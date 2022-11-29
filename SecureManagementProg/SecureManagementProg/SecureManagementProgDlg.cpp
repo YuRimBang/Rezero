@@ -54,6 +54,7 @@ CSecureManagementProgDlg::CSecureManagementProgDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_SECUREMANAGEMENTPROG_DIALOG, pParent)
 	, m_nClk(FALSE)
 	, m_Init(FALSE)
+	, m_bSQL(FALSE)
 	, m_cstInternet(_T("chrome.exe"))
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -68,6 +69,7 @@ void CSecureManagementProgDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_PC_IMG, m_pcPlatformImg);
 	DDX_Control(pDX, IDC_EDIT_LINK, m_edLink);
 	DDX_Control(pDX, IDC_CB_INTERNET, m_cbInternet);
+	DDX_Control(pDX, IDC_PROGRESS, m_progress);
 }
 
 BEGIN_MESSAGE_MAP(CSecureManagementProgDlg, CDialogEx)
@@ -128,6 +130,8 @@ BOOL CSecureManagementProgDlg::OnInitDialog()
 	SetUpForDynamicLayout();	//DynamicLayout
 	GetDlgItem(IDC_STATIC_HYPERLINK)->SetWindowTextW(L"사이트 바로가기");	//사이트
 	ConntectSQL();		//Mysql 연결
+	m_progress.SetBarColor(RGB(204,102,204));
+	m_progress.SetRange(0, 100); 
 
 	CRect rt;
 	m_ListCtrl.GetWindowRect(&rt);
@@ -170,6 +174,7 @@ void CSecureManagementProgDlg::SetUpForDynamicLayout()
 	ManagerMainView->AddItem((IDC_PC_IMG), move_x_100, size_none);
 	ManagerMainView->AddItem((IDC_CB_INTERNET), move_x_100, size_none);
 	ManagerMainView->AddItem((IDC_STATIC_HYPERLINK), move_x_100, size_none);
+	ManagerMainView->AddItem((IDC_PROGRESS), move_x_100, size_none);
 
 	ManagerMainView->AddItem(IDC_EDIT_SEARCH, move_none, size_x_100);
 	ManagerMainView->AddItem(IDC_LIST_RES, move_none, size_both);
@@ -255,9 +260,18 @@ LRESULT CSecureManagementProgDlg::OnProgressUpdate(WPARAM wParam, LPARAM lParam)
 
 void CSecureManagementProgDlg::ConntectSQL()
 {
-	m_CMySQL.ConnectToDB(&m_connection);
+	if (m_CMySQL.ConnectToDB(&m_connection, m_char))
+		m_bSQL = TRUE;
+	else
+		AfxMessageBox(_T("MySQL의 외부 접속이 실패하였습니다."));
 }
 
+void CSecureManagementProgDlg::FreeSQL()
+{
+	MYSQL_RES res;
+	m_CMySQL.FreeSQL(&res);
+	m_bSQL = FALSE;
+}
 void CSecureManagementProgDlg::OnPaint()
 {
 	if (IsIconic())
@@ -295,14 +309,18 @@ HCURSOR CSecureManagementProgDlg::OnQueryDragIcon()
 
 void CSecureManagementProgDlg::InitSearchMenu()
 {
-	m_cbSearchMenu.AddString(_T("통합 검색"));
-	m_cbSearchMenu.AddString(_T("제1금융권"));
-	m_cbSearchMenu.AddString(_T("정부 기관"));
-	m_cbSearchMenu.AddString(_T("비은행예금 취급기관"));
-	m_cbSearchMenu.AddString(_T("증권 회사"));
-	m_cbSearchMenu.AddString(_T("보험 회사"));
-	m_cbSearchMenu.AddString(_T("기타 금용회사"));
-	m_cbSearchMenu.AddString(_T("보안프로그램"));
+	m_cbSearchMenu.AddString(_T("내부IP"));
+	m_cbSearchMenu.AddString(_T("외부IP"));
+	m_cbSearchMenu.AddString(_T("내pc"));
+
+	//m_cbSearchMenu.AddString(_T("통합 검색"));
+	//m_cbSearchMenu.AddString(_T("제1금융권"));
+	//m_cbSearchMenu.AddString(_T("정부 기관"));
+	//m_cbSearchMenu.AddString(_T("비은행예금 취급기관"));
+	//m_cbSearchMenu.AddString(_T("증권 회사"));
+	//m_cbSearchMenu.AddString(_T("보험 회사"));
+	//m_cbSearchMenu.AddString(_T("기타 금용회사"));
+	//m_cbSearchMenu.AddString(_T("보안프로그램"));
 
 	m_cbSearchMenu.SetCurSel(0);
 }
@@ -355,24 +373,33 @@ UINT CSecureManagementProgDlg::ThreadSearchSecureprog(LPVOID pParam)
 
 void CSecureManagementProgDlg::SearchSecureProgram()
 {
+	m_progress.SetPos(0);
+	if (!m_bSQL)
+		return;
 	CString cstSearch;
 	vector<CString> PfCode, SecName, PfName, PfType;
 	GetDlgItemText(IDC_EDIT_SEARCH, cstSearch);
 	if (cstSearch.IsEmpty())	return;
 	m_nClk = TRUE;
-
+	m_progress.OffsetPos(10);
 	m_CPlatform.SetFindVar(cstSearch);
-	m_CPlatform.GetColumns(&m_connection, &PfCode, &PfName,&PfType);
+	m_CPlatform.GetColumns(&m_connection, &PfCode, &PfName, &PfType);
 	m_ListBox.ResetContent();
+	m_progress.OffsetPos(10);
 	for (CString name : PfName)
 	{
 		m_ListBox.AddString(name);
 	}
+	m_progress.OffsetPos(10);
 }
 
 void CSecureManagementProgDlg::OnBnClickedBtnStatus()
 {
+	vector<CString> cstsecname;
+
 	m_pCCurSecureManger = new CCurSecureManager();
+	m_CSecurityprog.GetAllSecName(&m_connection,&cstsecname);
+	m_pCCurSecureManger->GetSecList(cstsecname);
 	m_pCCurSecureManger->DoModal();
 }
 
@@ -381,6 +408,15 @@ void CSecureManagementProgDlg::OnCbnSelchangeCbSearch()
 	COperationStatus::SetSearching(TRUE);
 	INT nCursel = m_cbSearchMenu.GetCurSel();
 	m_SearchCondition = nCursel + 0X64;	//검색조건
+
+	if (nCursel == 0 || nCursel ==2)
+		m_char = DB_MYHOST;
+	else
+		m_char = DB_HOST;
+
+	FreeSQL();
+	ConntectSQL();
+
 	COperationStatus::SetSearching(FALSE);
 }
 

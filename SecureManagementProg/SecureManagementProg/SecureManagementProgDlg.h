@@ -48,7 +48,7 @@ protected:
 	BOOL							m_Init;
 	BOOL							m_bSubDialog;
 	BOOL							m_nClk;	//서칭확인
-	
+	BOOL							m_bSQL;
 	// Generated message map functions
 	afx_msg void					OnSize(UINT nType, int cx, int cy);		//Dailog size
 	afx_msg void					OnSysCommand(UINT nID, LPARAM lParam);
@@ -72,6 +72,7 @@ protected:
 protected:
 	void								SetUpForDynamicLayout();
 	void								ConntectSQL();	//SQL연결
+	void								FreeSQL();	//SQL연결해제
 	void								InitSearchMenu();	//검색 조건 초기화
 	void								InitInternetMenu();	//인터넷
 	void								AllocForm();	//Feature Dlg 메인 다이얼로그에 붙이기
@@ -82,6 +83,7 @@ protected:
 	CString							csIsInstall(CString secname);
 	BOOL							IsInstall(CString secname);
 	static UINT						ThreadSearchSecureprog(LPVOID pParam);
+
 public:
 	CString							m_cstInternet;	//사용할 하이퍼링크 실행파일
 	CString							m_cstImg;
@@ -94,10 +96,11 @@ public:
 	INT								m_SearchCondition;	//검색조건
 
 public:
-
+	const char* m_char;
 
 	CStatic m_pcPlatformImg;
 	CEdit m_edLink;
 	afx_msg void OnStnClickedStaticHyperlink();
 	afx_msg void OnCbnSelchangeCbInternet();
+	CProgressCtrl m_progress;
 };

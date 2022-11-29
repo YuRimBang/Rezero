@@ -2,6 +2,7 @@
 #include "CMySQL.h"
 #include "MySQLDefinition.h"
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -22,7 +23,7 @@ public:
 public:
 	char*						 CStringToChar(CString csting);		//CString -> char* 데이터타입 변환
 
-	BOOL					ConnectToDB(MYSQL* mysql);		//DB연결
+	BOOL					ConnectToDB(MYSQL* mysql, const char* host);		//DB연결
 	BOOL					Isinit(CString orgincst, CString findcst);
 
 	VOID						Finish_with_error(MYSQL* con);	//mysql 연결 실패시 error
@@ -102,6 +103,7 @@ public:
 	/*Getter*/
 	void						GetColumns(MYSQL* connect, vector<CString>* SecureProgname, vector<CString> PfCode, vector<CString>* Install);
 	void						GetFieldsNum(MYSQL_RES* res);
+	void						GetAllSecName(MYSQL* connect, vector<CString>* Secname);
 	CString					GetName() { return m_cstName; }
 	CString					GetInstall() { return m_cstInstall; }
 	CString					GetCode() { return m_cstCode; }

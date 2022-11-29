@@ -23,10 +23,14 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	virtual BOOL OnInitDialog();
+	void GetSecList(vector<CString> sec) { m_vSec.swap(sec); };
+	HKEY AccessRegist(vector<CString> vSecname);
 
 private:
+	vector<CString>	m_vSec;
 	vector<CString> m_List;
 	vector<CHAR> GetKeyList(HKEY hKey);
 public:
 	afx_msg void OnBnClickedBtnCurdel();
+	CListBox m_ListBox;
 };

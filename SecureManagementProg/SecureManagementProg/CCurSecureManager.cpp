@@ -23,70 +23,52 @@ CCurSecureManager::~CCurSecureManager()
 
 void CCurSecureManager::DoDataExchange(CDataExchange* pDX)
 {
-	CDialogEx::DoDataExchange(pDX);
+    CDialogEx::DoDataExchange(pDX);
+    DDX_Control(pDX, IDC_LIST_CURSECURE, m_ListBox);
 }
 
+HKEY CCurSecureManager::AccessRegist(vector<CString> vSecname)
+{
+    HKEY hKey;
+    TCHAR szDefaultPath[_MAX_PATH] = { 0 };
+    DWORD dwBufLen = MAX_PATH;
+    DWORD dwBytes = 0;
+    LSTATUS	RegOpen = ERROR_SUCCESS;
+    CString cstRegistPath;
+
+    cstRegistPath.Format(L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run");
+    RegOpen = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,
+        cstRegistPath, 0, KEY_ALL_ACCESS | KEY_WOW64_64KEY, &hKey);
+    if(RegOpen == ERROR_SUCCESS)
+        AfxMessageBox(_T("Success to Access Regist"));
+    else
+        AfxMessageBox(_T("Fail to Access Regist"));
+
+    for (CString Secname : vSecname)
+    {
+        RegOpen = ::RegQueryValueEx(hKey, Secname, NULL, NULL, NULL, &dwBytes);
+        if (RegOpen == ERROR_SUCCESS)
+        {
+            LONG lResult = RegQueryValueEx(hKey, Secname, NULL, NULL, (LPBYTE)szDefaultPath, &dwBytes);
+            m_ListBox.AddString(Secname);
+        }
+    }
+    RegCloseKey(hKey);
+
+    return hKey;
+}
 
 BOOL CCurSecureManager::OnInitDialog()
 {
     CDialogEx::OnInitDialog();
 
-    if (m_List.empty())
-    {
-
-    }
-
-	HKEY hKey;
-	TCHAR szDefaultPath[_MAX_PATH] = { 0 };
-	DWORD dwBufLen = MAX_PATH;
-	LSTATUS	RegOpen = ERROR_SUCCESS;
-    CString cstRegistPath;
-    FILETIME filetime;
-
-    cstRegistPath.Format(L"Software\\Microsoft\\Windows\\CurrentVersion\\Run");
-
-	RegOpen = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE,
-        cstRegistPath, 0, KEY_READ, &hKey);
-
-	if (RegOpen == ERROR_SUCCESS)
-	{
-		AfxMessageBox(_T("Success to Access Regist"));
-
-		CString sValName = _T("AhnLab Safe Transaction Application");
-		CString var;
-
-        long res = RegQueryInfoKey(hKey, NULL, 0, 0,NULL, NULL, NULL, &dwBufLen, NULL, NULL, NULL,&filetime);
-        var.Format(_T("%ld"), res);
-        AfxMessageBox(var);
-		TCHAR atcvalue[MAX_PATH];
-		::ZeroMemory(atcvalue, sizeof(atcvalue));
-
-
-		RegOpen = ::RegQueryValueEx(hKey, NULL, NULL, NULL, (LPBYTE)atcvalue, &dwBufLen);
-        if (RegOpen == ERROR_SUCCESS)
-        {
-            CString sResult;
-            sResult = atcvalue;
-            delete atcvalue;
-        }
-
-       // for (CHAR ch : GetKeyList(hKey))
-       // {
-       //     AfxMessageBox(_T(" %s", ch));
-       //}
-	}
-	else
-		AfxMessageBox(_T("Fail to Access Regist"));
-
-	//RegQueryValueEx(hKey,L"ProgramFilesDir", NULL, NULL, (LPBYTE)szDefaultPath, &dwBufLen);
-	RegCloseKey(hKey);
-
-	//CString m_strBaseFindDir = CString(szDefaultPath) + CString("/NPKI/");
-	//CString m_strBaseFindPath = CString(szDefaultPath) + CString("/NPKI/*.*");
-
+    if (!m_List.empty())
+        m_List.clear();
+    AccessRegist(m_vSec);
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // EXCEPTION: OCX Property Pages should return FALSE
 }
+
 
 BEGIN_MESSAGE_MAP(CCurSecureManager, CDialogEx)
     ON_BN_CLICKED(IDC_BTN_CURDEL, &CCurSecureManager::OnBnClickedBtnCurdel)
