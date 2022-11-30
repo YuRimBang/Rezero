@@ -24,6 +24,8 @@ public:
 	virtual BOOL			Create(LPCTSTR lpszClassName, LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, CWnd* pParentWnd, UINT nID, CCreateContext* pContext = NULL);
 	virtual void				OnInitialUpdate();
 	
+	void						SetActivation(BOOL chk);
+
 	afx_msg void			OnBnClickedBtnDelete();	//Delete Button
 	afx_msg void			OnBnClickedBtnAbout();	//About Button
 	afx_msg void			OnBnClickedBtnCheck();	//Activation checkbox

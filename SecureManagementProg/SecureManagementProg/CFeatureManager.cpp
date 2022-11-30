@@ -26,6 +26,7 @@ void CFeatureManager::DoDataExchange(CDataExchange* pDX)
 	CFormView::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_CHK_ACTIVATION, m_chActivation);
 	DDX_Control(pDX, IDC_EDIT_DISK, m_editDistk);
+	//DDX_Control(pDX, IDC_CHK_ACTIVATION, m_chkActivation);
 }
 
 
@@ -67,6 +68,7 @@ void CFeatureManager::ButtonStatusInit(BOOL IsStatus)
 	//GetDlgItem(IDC_BTN_ABOUT)->EnableWindow(IsStatus);
 	GetDlgItem(IDC_EDIT_VOLUME)->EnableWindow(IsStatus);
 	GetDlgItem(IDC_EDIT_DISK)->EnableWindow(IsStatus);
+	GetDlgItem(IDC_CHK_ACTIVATION)->EnableWindow(IsStatus);
 }
 
 void CFeatureManager::SetEditLink(CString link)
@@ -77,9 +79,18 @@ void CFeatureManager::SetEditLink(CString link)
 		SetDlgItemText(IDC_EDIT_DISK, link);
 }
 
+void CFeatureManager::SetActivation(BOOL chk)
+{
+	//m_chkActivation.SetCheck(chk);
+	((CButton*)GetDlgItem(IDC_CHK_ACTIVATION))->SetCheck(chk);
+}
+
 void CFeatureManager::OnBnClickedBtnCheck()
 {
-	((CButton*)GetDlgItem(IDC_CHK_ACTIVATION))->GetCheck();
+	if (((CButton*)GetDlgItem(IDC_CHK_ACTIVATION))->GetCheck())
+		AfxMessageBox(_T("활성화 되었습니다!"));
+	else
+		AfxMessageBox(_T("비활성화 되었습니다!"));
 }
 
 void CFeatureManager::OnBnClickedBtnDelete()

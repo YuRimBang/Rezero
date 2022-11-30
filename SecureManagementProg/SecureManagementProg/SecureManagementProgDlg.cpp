@@ -409,8 +409,10 @@ void CSecureManagementProgDlg::OnCbnSelchangeCbSearch()
 	INT nCursel = m_cbSearchMenu.GetCurSel();
 	m_SearchCondition = nCursel + 0X64;	//검색조건
 
-	if (nCursel == 0 || nCursel ==2)
+	if (nCursel == 0 || nCursel == 2)
+	{
 		m_char = DB_MYHOST;
+	}
 	else
 		m_char = DB_HOST;
 
@@ -465,6 +467,11 @@ void CSecureManagementProgDlg::OnLvnItemchangedListRes(NMHDR* pNMHDR, LRESULT* p
 	m_pFeature->GetSecname(&secname);
 	vPfCode.swap(m_CPlatform.GetPfNamebyCode(&m_connection, m_CSecurityprog.GetPlatformbySec(&m_connection, secname)));
 	m_pFeature->GetCode(&vPfCode);
+
+	if (secname == L"AhnLab Safe Transaction Application")
+		m_pFeature->SetActivation(TRUE);
+	else
+		m_pFeature->SetActivation(FALSE);
 	*pResult = 0;
 }
 
